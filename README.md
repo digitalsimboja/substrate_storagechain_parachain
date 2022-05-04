@@ -40,7 +40,7 @@ Run the command below to install the dependencies
 To start the Local Node:
 ` ./target/release/node-storagechain --dev --tmp`
 
-Open another `tmux` session and change to the substrate-front-end-template
+Open another `tmux` pane and change to the substrate-front-end-template
 `cd substrate-front-end-template`
 
 Start the client 
