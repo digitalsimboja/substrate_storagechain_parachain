@@ -44,9 +44,8 @@ pub mod pallet {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
-		#[pallet::constant]
-
 		/// The minimum value which must not be below zero
+		#[pallet::constant]
 		type StorageMinimum: Get<u32>;
 
 		/// The Currency handler for the Storagechain pallet.
@@ -94,13 +93,13 @@ pub mod pallet {
 	// Errors.
 	#[pallet::error]
 	pub enum Error<T> {
-		// When a user is attempting to store a negative number
+		/// When a user is attempting to store a negative number
 		NegativeNumber,
 
-		// Invalid action type
+		/// Invalid action type
 		InvalidActionType,
 
-		/// An operation would lead to an overflow
+		/// An operation that would lead to an overflow
 		Overflow,
 
 		/// Allow the storage to be changed by the person who stored the item
@@ -127,7 +126,7 @@ pub mod pallet {
 			let stored_id = Self::add_to_storage(storer, number, action_match);
 
 			// We simply log the stored Id
-			log::info!("An storage item with ID: {:?} has been added to store.", stored_id);
+			log::info!("A storage item with ID: {:?} has been added to store.", stored_id);
 
 			Ok(())
 		}
@@ -180,8 +179,6 @@ pub mod pallet {
 				},
 				_ => (),
 			}
-
-
 
 			Ok(())
 		}
