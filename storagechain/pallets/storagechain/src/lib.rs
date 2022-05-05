@@ -109,10 +109,10 @@ pub mod pallet {
 		ItemNotExist,
 	}
 
-	// Extrinsics callable from outside the runtime.
+	/// Extrinsics callable from outside the runtime.
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		// Store a single value and an action
+		/// Store a single value and an action
 		#[pallet::weight(1_000)]
 		pub fn store(origin: OriginFor<T>, val_to_add: u32, action: Action) -> DispatchResult {
 			let storer = ensure_signed(origin)?;
@@ -127,7 +127,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		// Define an extrinsic function to change a stored action
+		/// Define an extrinsic function to change a stored action
 		#[pallet::weight(1_000)]
 		pub fn change_action(
 			origin: OriginFor<T>,
@@ -208,7 +208,7 @@ pub mod pallet {
 
 		pub fn update_storage(storage_id: T::Hash, action: Action) -> DispatchResult {
 			let payload = Self::storages(&storage_id).ok_or(<Error<T>>::ItemNotExist)?;
-			let new_update = Storage { num: payload.num, action, storer: payload.storer };
+			let new_update = Storage { num: payload.num, action: action, storer: payload.storer };
 			<Storages<T>>::mutate(storage_id, |items| match items {
 				None => Err(()),
 				Some(val) => {
