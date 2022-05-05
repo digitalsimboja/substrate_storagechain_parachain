@@ -76,7 +76,7 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// When a new item is Stored
-		Stored(Option<Action>, T::Hash, T::AccountId),
+		Stored(Action, T::Hash, T::AccountId),
 		/// In case we wish to clear the storage after some blocks
 		Cleared(u32),
 
@@ -114,16 +114,12 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		// Store a single value and an action
 		#[pallet::weight(1_000)]
-		pub fn store(
-			origin: OriginFor<T>,
-			val_to_add: u32,
-			action: Option<Action>,
-		) -> DispatchResult {
+		pub fn store(origin: OriginFor<T>, val_to_add: u32, action: Action) -> DispatchResult {
 			let storer = ensure_signed(origin)?;
-			let action_match = action;
-			let number = val_to_add;
 			ensure!(val_to_add >= T::StorageMinimum::get(), <Error<T>>::NegativeNumber);
-			let stored_id = Self::add_to_storage(storer, number, action_match);
+			let storage_item =
+				Storage { num: val_to_add.clone(), action: action.clone(), storer: storer.clone() };
+			let stored_id = Self::add_to_storage(storage_item);
 
 			// We simply log the stored Id
 			log::info!("A storage item with ID: {:?} has been added to store.", stored_id);
@@ -136,18 +132,15 @@ pub mod pallet {
 		pub fn change_action(
 			origin: OriginFor<T>,
 			storage_id: T::Hash,
-			new_action: Option<Action>,
+			new_action: Action,
 		) -> DispatchResult {
 			let sender = ensure_signed(origin)?;
 
 			// Aside: Let's ensure the right owner is the one making the changes on storage
 			// This is just an added edge case
 			ensure!(Self::is_storage_owner(&storage_id, &sender)?, <Error<T>>::NotStorageOwner);
-			let mut storage_item = Self::storages(&storage_id).ok_or(<Error<T>>::ItemNotExist)?;
-			storage_item.action = new_action.clone().unwrap();
 
-			let updated_id = Self::update_storage(sender, storage_id, storage_item, new_action);
-
+			let updated_id = Self::update_storage(storage_id, new_action);
 			// We simply log the id
 			log::info!("An storage item with ID: {:?} has been updated", updated_id);
 
@@ -187,38 +180,18 @@ pub mod pallet {
 	//** Our helper functions.**//
 
 	impl<T: Config> Pallet<T> {
-		// helper function for Storage struct for changing the action
-		fn gen_action() -> Action {
-			let random = T::StorageRandomness::random(&b"action"[..]).0;
-			match random.as_ref()[0] % 3 {
-				0 => Action::Increment,
-				1 => Action::Decrement,
-				_ => Action::Idle,
-			}
-		}
-
-		fn add_to_storage(
-			storer: T::AccountId,
-			val_to_add: u32,
-			action: Option<Action>,
-		) -> Result<T::Hash, Error<T>> {
-			let storage_item = Storage::<T> {
-				num: val_to_add,
-				storer: storer.clone(),
-				action: action.clone().unwrap_or_else(|| Self::gen_action()),
-			};
-			let storage_id = T::Hashing::hash_of(&storage_item);
+		fn add_to_storage(storage: Storage<T>) -> Result<T::Hash, Error<T>> {
+			let storage_id = T::Hashing::hash_of(&storage);
 
 			// Check the number of items in the store
 			// We could go further to check if maximum storage is reached assuming we want to
 			let new_cnt = Self::counts_of_storage().checked_add(1).ok_or(<Error<T>>::Overflow)?;
-			
-			<Storages<T>>::insert(storage_id, storage_item);
+			let sender = storage.storer.clone();
+			let action = storage.action.clone();
+			<Storages<T>>::insert(storage_id, storage);
 			<CountsOfStorage<T>>::put(new_cnt);
 
-	
-
-			Self::deposit_event(Event::Stored(action, storage_id, storer));
+			Self::deposit_event(Event::Stored(action, storage_id, sender));
 
 			Ok(storage_id)
 		}
@@ -233,17 +206,19 @@ pub mod pallet {
 			}
 		}
 
-		fn update_storage(
-			storer: T::AccountId,
-			item_id: T::Hash,
-			storage: Storage<T>,
-			action: Option<Action>,
-		) -> Result<T::Hash, Error<T>> {
-			<Storages<T>>::insert(&item_id, storage);
+		pub fn update_storage(storage_id: T::Hash, action: Action) -> DispatchResult {
+			let payload = Self::storages(&storage_id).ok_or(<Error<T>>::ItemNotExist)?;
+			let new_update = Storage { num: payload.num, action, storer: payload.storer };
+			<Storages<T>>::mutate(storage_id, |items| match items {
+				None => Err(()),
+				Some(val) => {
+					*val = new_update;
+					Ok(storage_id)
+				},
+			})
+			.map_err(|_| <Error<T>>::ItemNotExist)?;
 
-			Self::deposit_event(Event::ActionChanged(storer, item_id, action));
-
-			Ok(item_id)
+			Ok(())
 		}
 
 		fn _increment(
