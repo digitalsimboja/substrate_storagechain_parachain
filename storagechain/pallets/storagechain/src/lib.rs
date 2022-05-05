@@ -81,7 +81,7 @@ pub mod pallet {
 		Cleared(u32),
 
 		/// When a new action is updated on the storage
-		ActionChanged(T::AccountId, T::Hash, Option<Action>),
+		ActionChanged(T::AccountId, T::Hash, Action),
 
 		// When a value is incremented
 		Incremented(T::AccountId, T::Hash, Action),
@@ -159,16 +159,14 @@ pub mod pallet {
 			// Aside: Let's ensure the right owner is the one making the changes on storage
 			ensure!(Self::is_storage_owner(&storage_id, &sender)?, <Error<T>>::NotStorageOwner);
 
-			// Get the stored item
-			let storage_item = Self::storages(&storage_id).ok_or(<Error<T>>::ItemNotExist)?;
 			let call_action = action.clone();
 
 			match call_action {
 				Some(call_type @ Action::Increment) => {
-					_ = Self::_increment(storage_item, storage_id, sender, call_type);
+					_ = Self::_increment(storage_id, sender, call_type);
 				},
 				Some(call_type @ Action::Decrement) => {
-					_ = Self::_decrement(storage_item, storage_id, sender, call_type);
+					_ = Self::_decrement(storage_id, sender, call_type);
 				},
 				_ => (),
 			}
@@ -208,7 +206,9 @@ pub mod pallet {
 
 		pub fn update_storage(storage_id: T::Hash, action: Action) -> DispatchResult {
 			let payload = Self::storages(&storage_id).ok_or(<Error<T>>::ItemNotExist)?;
-			let new_update = Storage { num: payload.num, action: action, storer: payload.storer };
+			let sender = payload.storer.clone();
+			let updated_action = action.clone();
+			let new_update = Storage { num: payload.num, action, storer: payload.storer };
 			<Storages<T>>::mutate(storage_id, |items| match items {
 				None => Err(()),
 				Some(val) => {
@@ -218,40 +218,53 @@ pub mod pallet {
 			})
 			.map_err(|_| <Error<T>>::ItemNotExist)?;
 
+			Self::deposit_event(Event::ActionChanged(sender, storage_id, updated_action));
+
 			Ok(())
 		}
 
-		fn _increment(
-			storage: Storage<T>,
-			id: T::Hash,
-			sender: T::AccountId,
-			action: Action,
-		) -> Result<T::Hash, Error<T>> {
-			let action_id = T::Hashing::hash_of(&storage);
-			let mut storage = storage;
-			let num_inc = storage.num + 1;
-			storage.num = num_inc;
-			<Storages<T>>::insert(&id, storage);
+		fn _increment(storage_id: T::Hash, sender: T::AccountId, action: Action) -> DispatchResult {
+			// Get the stored item
+			let payload = Self::storages(&storage_id).ok_or(<Error<T>>::ItemNotExist)?;
+			let updated_action = action.clone();
 
-			Self::deposit_event(Event::Incremented(sender, id, action));
+			let incremented_update =
+				Storage { num: payload.num + 1, action, storer: payload.storer.clone() };
 
-			Ok(action_id)
+			<Storages<T>>::mutate(storage_id, |items| match items {
+				None => Err(()),
+				Some(val) => {
+					*val = incremented_update;
+					Ok(storage_id)
+				},
+			})
+			.map_err(|_| <Error<T>>::ItemNotExist)?;
+
+			Self::deposit_event(Event::ActionChanged(sender, storage_id, updated_action));
+
+			Ok(())
 		}
 
-		fn _decrement(
-			storage: Storage<T>,
-			id: T::Hash,
-			sender: T::AccountId,
-			action: Action,
-		) -> Result<T::Hash, Error<T>> {
-			let action_id = T::Hashing::hash_of(&storage);
-			let mut storage = storage;
-			storage.num = storage.num - 1;
-			<Storages<T>>::insert(&id, storage);
+		fn _decrement(storage_id: T::Hash, sender: T::AccountId, action: Action) -> DispatchResult {
+			// Get the stored item
+			let payload = Self::storages(&storage_id).ok_or(<Error<T>>::ItemNotExist)?;
+			let updated_action = action.clone();
 
-			Self::deposit_event(Event::Decremented(sender, id, action));
+			let decremented_update =
+				Storage { num: payload.num - 1, action, storer: payload.storer.clone() };
 
-			Ok(action_id)
+			<Storages<T>>::mutate(storage_id, |items| match items {
+				None => Err(()),
+				Some(val) => {
+					*val = decremented_update;
+					Ok(storage_id)
+				},
+			})
+			.map_err(|_| <Error<T>>::ItemNotExist)?;
+
+			Self::deposit_event(Event::ActionChanged(sender, storage_id, updated_action));
+
+			Ok(())
 		}
 	}
 }
