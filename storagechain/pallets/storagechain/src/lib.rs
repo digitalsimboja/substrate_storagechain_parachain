@@ -208,7 +208,11 @@ pub mod pallet {
 			let payload = Self::storages(&storage_id).ok_or(<Error<T>>::ItemNotExist)?;
 			let sender = payload.storer.clone();
 			let updated_action = action.clone();
-			let new_update = Storage { num: payload.num, action, storer: payload.storer };
+			let new_update = Storage { 
+				num: payload.num, 
+				action: action, 
+				storer: payload.storer 
+			};
 			<Storages<T>>::mutate(storage_id, |items| match items {
 				None => Err(()),
 				Some(val) => {
@@ -229,7 +233,11 @@ pub mod pallet {
 			let updated_action = action.clone();
 
 			let incremented_update =
-				Storage { num: payload.num + 1, action, storer: payload.storer.clone() };
+				Storage { 
+					num: payload.num + 1, 
+					action: action, 
+					storer: payload.storer.clone() 
+				};
 
 			<Storages<T>>::mutate(storage_id, |items| match items {
 				None => Err(()),
@@ -251,7 +259,11 @@ pub mod pallet {
 			let updated_action = action.clone();
 
 			let decremented_update =
-				Storage { num: payload.num - 1, action, storer: payload.storer.clone() };
+				Storage { 
+					num: payload.num - 1, 
+					action: action, 
+					storer: payload.storer.clone() 
+				};
 
 			<Storages<T>>::mutate(storage_id, |items| match items {
 				None => Err(()),
