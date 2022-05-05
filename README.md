@@ -43,6 +43,9 @@ To start the Local Node:
 Open another `tmux` pane and change to the substrate-front-end-template
 `cd substrate-front-end-template`
 
+Install the dependencies
+`yarn install`
+
 Start the client 
 `yarn start`
 
