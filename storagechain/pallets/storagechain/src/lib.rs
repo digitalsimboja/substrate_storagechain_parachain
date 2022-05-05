@@ -248,7 +248,7 @@ pub mod pallet {
 			})
 			.map_err(|_| <Error<T>>::ItemNotExist)?;
 
-			Self::deposit_event(Event::ActionChanged(sender, storage_id, updated_action));
+			Self::deposit_event(Event::Incremented(sender, storage_id, updated_action));
 
 			Ok(())
 		}
@@ -274,7 +274,7 @@ pub mod pallet {
 			})
 			.map_err(|_| <Error<T>>::ItemNotExist)?;
 
-			Self::deposit_event(Event::ActionChanged(sender, storage_id, updated_action));
+			Self::deposit_event(Event::Decremented(sender, storage_id, updated_action));
 
 			Ok(())
 		}
