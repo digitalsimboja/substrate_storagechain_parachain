@@ -71,7 +71,7 @@ export default function Storagechain(props) {
       <h1>Storages</h1>
       <StorageCards storages={storages} setStatus={setStatus} />
       <Form style={{ margin: '1em 0' }}>
-        <Form.Field style={{ textAlign: 'center' }}>
+        <Form.Field>
           <Form.Input
             fluid
             label="Number"
@@ -80,7 +80,7 @@ export default function Storagechain(props) {
           />
         </Form.Field>
 
-        <Form.Field style={{ textAlign: 'center' }}>
+        <Form.Field>
           <Form.Input
             fluid
             label="Action"

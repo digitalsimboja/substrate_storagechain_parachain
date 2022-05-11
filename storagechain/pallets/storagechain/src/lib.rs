@@ -76,7 +76,7 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// When a new item is Stored
-		Stored(Action, T::Hash, T::AccountId),
+		Stored(Action, T::Hash, T::AccountId, u32),
 		/// In case we wish to clear the storage after some blocks
 		Cleared(u32),
 
@@ -186,10 +186,11 @@ pub mod pallet {
 			let new_cnt = Self::counts_of_storage().checked_add(1).ok_or(<Error<T>>::Overflow)?;
 			let sender = storage.storer.clone();
 			let action = storage.action.clone();
+			let number = storage.num.clone();
 			<Storages<T>>::insert(storage_id, storage);
 			<CountsOfStorage<T>>::put(new_cnt);
 
-			Self::deposit_event(Event::Stored(action, storage_id, sender));
+			Self::deposit_event(Event::Stored(action, storage_id, sender, number ));
 
 			Ok(storage_id)
 		}
