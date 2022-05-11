@@ -23,6 +23,8 @@ import TemplateModule from './TemplateModule'
 import Transfer from './Transfer'
 import Upgrade from './Upgrade'
 
+import Storagechain from './Storagechain'
+
 function Main() {
   const { apiState, apiError, keyringState } = useSubstrateState()
 
@@ -84,7 +86,11 @@ function Main() {
           <Grid.Row>
             <TemplateModule />
           </Grid.Row>
+          <Grid.Row>
+            <Storagechain />
+          </Grid.Row>          
         </Grid>
+        
       </Container>
       <DeveloperConsole />
     </div>
