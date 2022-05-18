@@ -56,11 +56,12 @@ among the above
 
 Let us start by installing the pre-requisites:
 
-> sudo apt update
->
-> sudo apt upgrade
->
-> sudo apt install -y adduser libfontconfig1
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install -y adduser libfontconfig1
+
+```
 
 <br>
 
@@ -68,117 +69,98 @@ Let us start by installing the pre-requisites:
 [Grafana](https://grafana.com/grafana/download) from their respective download
 pages.
 
-> wget https://github.com/prometheus/prometheus/releases/download/v2.35.0/prometheus-2.35.0.linux-amd64.tar.gz
->
-> wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
->
-> wget https://github.com/ncabatoff/process-exporter/releases/download/v0.7.10/process-exporter-0.7.10.linux-amd64.tar.gz
->
-> wget https://github.com/prometheus/alertmanager/releases/download/v0.24.0/alertmanager-0.24.0.linux-amd64.tar.gz
->
-> wget https://dl.grafana.com/oss/release/grafana_8.5.2_amd64.deb
+```
+wget https://github.com/prometheus/prometheus/releases/download/v2.35.0/prometheus-2.35.0.linux-amd64.tar.gz
+wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+wget https://github.com/ncabatoff/process-exporter/releases/download/v0.7.10/process-exporter-0.7.10.linux-amd64.tar.gz
+wget https://github.com/prometheus/alertmanager/releases/download/v0.24.0/alertmanager-0.24.0.linux-amd64.tar.gz
+wget https://dl.grafana.com/oss/release/grafana_8.5.2_amd64.deb
+
+```
 
 <br>
 
 **Extract** the downloaded files:
 
-> tar xvf prometheus-\*.tar.gz
->
-> tar xvf node_exporter-\*.tar.gz
->
-> tar xvf process-exporter-\*.tar.gz
->
-> tar xvf alertmanager-\*.tar.gz
->
-> sudo dpkg -i grafana\*.deb
+```
+tar xvf prometheus-\*.tar.gz
+tar xvf node_exporter-\*.tar.gz
+tar xvf process-exporter-\*.tar.gz
+tar xvf alertmanager-\*.tar.gz
+sudo dpkg -i grafana\*.deb
+```
 
 <br>
 
 **Copy** the extracted files into `/usr/local/bin:`
 
-> sudo cp ./prometheus-\*.linux-amd64/prometheus /usr/local/bin/
->
-> sudo cp ./prometheus-\*.linux-amd64/promtool /usr/local/bin/
->
-> sudo cp -r ./prometheus-\*.linux-amd64/consoles /etc/prometheus
->
-> sudo cp -r ./prometheus-\*.linux-amd64/console_libraries /etc/prometheus
->
-> sudo cp ./node_exporter-\*.linux-amd64/node_exporter /usr/local/bin/
->
-> sudo cp ./process-exporter-\*.linux-amd64/process-exporter /usr/local/bin/
->
-> sudo cp ./alertmanager-\*.linux-amd64/alertmanager /usr/local/bin/
->
-> sudo cp ./alertmanager-\*.linux-amd64/amtool /usr/local/bin/
+```
+sudo cp ./prometheus-\*.linux-amd64/prometheus /usr/local/bin/
+sudo cp ./prometheus-\*.linux-amd64/promtool /usr/local/bin/
+sudo cp -r ./prometheus-\*.linux-amd64/consoles /etc/prometheus
+sudo cp -r ./prometheus-\*.linux-amd64/console_libraries /etc/prometheus
+sudo cp ./node_exporter-\*.linux-amd64/node_exporter /usr/local/bin/
+sudo cp ./process-exporter-\*.linux-amd64/process-exporter /usr/local/bin/
+sudo cp ./alertmanager-\*.linux-amd64/alertmanager /usr/local/bin/
+sudo cp ./alertmanager-\*.linux-amd64/amtool /usr/local/bin/
+```
 
 **Install** the Alert manager plugin for Grafana:
 
-> sudo grafana-cli plugins install camptocamp-prometheus-alertmanager-datasource
+```
+sudo grafana-cli plugins install camptocamp-prometheus-alertmanager-datasource
+```
 
 <br>
 
 ### Create dedicated users:
 
-> sudo useradd --no-create-home --shell /usr/sbin/nologin prometheus
->
-> sudo useradd --no-create-home --shell /usr/sbin/nologin node_exporter
->
-> sudo useradd --no-create-home --shell /usr/sbin/nologin process-exporter
->
-> sudo useradd --no-create-home --shell /usr/sbin/nologin alertmanager
+```
+sudo useradd --no-create-home --shell /usr/sbin/nologin prometheus
+sudo useradd --no-create-home --shell /usr/sbin/nologin node_exporter
+sudo useradd --no-create-home --shell /usr/sbin/nologin process-exporter
+sudo useradd --no-create-home --shell /usr/sbin/nologin alertmanager
+```
 
 <br>  
   
 ### Create directories:
-> sudo mkdir /var/lib/prometheus  
->  
-> sudo mkdir /etc/process-exporter  
->  
-> sudo mkdir /etc/alertmanager  
->  
-> sudo mkdir /var/lib/alertmanager  
->
+```
+sudo mkdir /var/lib/prometheus  
+sudo mkdir /etc/process-exporter  
+sudo mkdir /etc/alertmanager  
+sudo mkdir /var/lib/alertmanager  
+```
 
 <br>
 
 ### Change the ownership for all directories:
 
-> sudo chown prometheus:prometheus /etc/prometheus/ -R
->
-> sudo chown prometheus:prometheus /var/lib/prometheus/ -R
->
-> sudo chown prometheus:prometheus /usr/local/bin/prometheus
->
-> sudo chown prometheus:prometheus /usr/local/bin/promtool
->
-> sudo chown node_exporter:node_exporter /usr/local/bin/node_exporter
->
-> sudo chown process-exporter:process-exporter /etc/process-exporter -R
->
-> sudo chown process-exporter:process-exporter /usr/local/bin/process-exporter
->
-> sudo chown alertmanager:alertmanager /etc/alertmanager/ -R
->
-> sudo chown alertmanager:alertmanager /var/lib/alertmanager/ -R
->
-> sudo chown alertmanager:alertmanager /usr/local/bin/alertmanager
->
-> sudo chown alertmanager:alertmanager /usr/local/bin/amtool
+```
+sudo chown prometheus:prometheus /etc/prometheus/ -R
+sudo chown prometheus:prometheus /var/lib/prometheus/ -R
+sudo chown prometheus:prometheus /usr/local/bin/prometheus
+sudo chown prometheus:prometheus /usr/local/bin/promtool
+sudo chown node_exporter:node_exporter /usr/local/bin/node_exporter
+sudo chown process-exporter:process-exporter /etc/process-exporter -R
+sudo chown process-exporter:process-exporter /usr/local/bin/process-exporter
+sudo chown alertmanager:alertmanager /etc/alertmanager/ -R
+sudo chown alertmanager:alertmanager /var/lib/alertmanager/ -R
+sudo chown alertmanager:alertmanager /usr/local/bin/alertmanager
+sudo chown alertmanager:alertmanager /usr/local/bin/amtool
+```
 
 <br>
 
 **Finally**, clean up the download directory:
 
-> rm -rf ./prometheus\*
->
-> rm -rf ./node_exporter\*
->
-> rm -rf ./process-exporter\*
->
-> rm -rf ./alertmanager\*
->
-> rm -rf ./grafana\*
+```
+rm -rf ./prometheus\*
+rm -rf ./node_exporter\*
+rm -rf ./process-exporter\*
+rm -rf ./alertmanager\*
+rm -rf ./grafana\*
+```
 
 <br>
 
@@ -188,7 +170,9 @@ pages.
 
 Edit the prometheus configuration file and add all the modules:
 
-> sudo nano /etc/prometheus/prometheus.yml
+```
+sudo nano /etc/prometheus/prometheus.yml
+```
 
 Paste the code snippets below and save:
 
@@ -235,9 +219,10 @@ scrape_configs:
 
 Create the alert rules file:
 
-> sudo touch /etc/prometheus/collator-rules.yml
->
-> sudo nano /etc/prometheus/collator-rules.yml
+```
+sudo touch /etc/prometheus/collator-rules.yml
+sudo nano /etc/prometheus/collator-rules.yml
+```
 
 Add the rules below and save:
 
@@ -414,11 +399,15 @@ groups:
 
 Check the rule files:
 
-> promtool check rules /etc/prometheus/collator-rulles.yml
+```
+promtool check rules /etc/prometheus/collator-rulles.yml
+```
 
 Check the **Prometheus** configuration file
 
-> promtool check config /etc/prometheus/prometheus.yml
+```
+promtool check config /etc/prometheus/prometheus.yml
+```
 
 <br>
 
@@ -427,9 +416,10 @@ Check the **Prometheus** configuration file
 Configure the process exporter using the configuration below. First create the
 config file
 
-> sudo touch /etc/process-exporter/config.yml
->
-> sudo nano /etc/process-exporter/config.yml
+```
+sudo touch /etc/process-exporter/config.yml
+sudo nano /etc/process-exporter/config.yml
+```
 
 Add the following lines
 
@@ -454,9 +444,10 @@ Create a Telegram [Bot](https://core.telegram.org/bots#6-botfather) to obtain th
 
 Setup the alert manager to call the external telegram service
 
-> sudo touch /etc/alertmanager/alertmanager.yml
->
-> sudo nano /etc/alertmanager/alertmanager.yml
+```
+sudo touch /etc/alertmanager/alertmanager.yml
+sudo nano /etc/alertmanager/alertmanager.yml
+```
 
 <br>
 
@@ -490,25 +481,28 @@ Create `systemd` services to handle restarting all the services created above.
 
 #### Node
 
-> sudo useradd --no-create-home --shell /usr/sbin/nologin t3rn
->
-> sudo cp ./t3rn /usr/local/bin
->
-> sudo chown t3rn:t3rn /usr/local/bin/t3rn
+```
+sudo useradd --no-create-home --shell /usr/sbin/nologin t3rn
+sudo cp ./t3rn /usr/local/bin
+sudo chown t3rn:t3rn /usr/local/bin/t3rn
+```
 
 Create a **dedicated directory for the chain storage data**:
 
-> sudo mkdir /var/lib/t3rn
->
-> sudo chown t3rn:t3rn /var/lib/t3rn
+```
+sudo mkdir /var/lib/t3rn
+sudo chown t3rn:t3rn /var/lib/t3rn
+```
 
 Create and open the node service file:
 
-> sudo touch /etc/systemd/system/t3rn.service
->
-> sudo nano /etc/systemd/system/t3rn.service
->
-> Add the lines and match with your node configuration
+```
+sudo touch /etc/systemd/system/t3rn.service
+sudo nano /etc/systemd/system/t3rn.service
+
+```
+
+Add the lines and match with your node configuration
 
 ```
 [Unit]
@@ -533,23 +527,29 @@ WantedBy=multi-user.target
 
 Reload daemon, start and check the service:
 
-> sudo systemctl daemon-reload
->
-> sudo systemctl start t3rn.service
->
-> sudo systemctl status t3rn.service
->
-> Once the service is running, enable the service:
->
-> sudo systemctl enable t3rn.service
+```
+sudo systemctl daemon-reload
+sudo systemctl start t3rn.service
+sudo systemctl status t3rn.service
+```
+
+Once the service is running, enable the service:
+
+```
+sudo systemctl enable t3rn.service
+```
 
 To check the service log:
 
-> journalctl -f -u t3rn -n100
+```
+journalctl -f -u t3rn -n100
+```
 
 **Note** To purge chain:
 
-> /usr/local/bin/plasm purge-chain
+```
+/usr/local/bin/plasm purge-chain
+```
 
 <br>
 
@@ -557,9 +557,10 @@ To check the service log:
 
 Create and open the Prometheus service file:
 
-> sudo touch /etc/systemd/system/prometheus.service
->
-> sudo nano /etc/systemd/system/prometheus.service
+```
+sudo touch /etc/systemd/system/prometheus.service
+sudo nano /etc/systemd/system/prometheus.service
+```
 
 Add the following lines:
 
@@ -591,9 +592,11 @@ Add the following lines:
 
 Create and open the node exporter service file
 
-> sudo touch /etc/systemd/system/node_exporter.service
->
-> sudo nano /etc/systemd/system/node_exporter.service
+```
+sudo touch /etc/systemd/system/node_exporter.service
+sudo nano /etc/systemd/system/node_exporter.service
+
+```
 
 Add the following lines:
 
@@ -620,9 +623,11 @@ Add the following lines:
 
 Create and open the Process exporter service file:
 
-> sudo touch /etc/systemd/system/process-exporter.service
->
-> sudo nano /etc/systemd/system/process-exporter.service
+```
+sudo touch /etc/systemd/system/process-exporter.service
+sudo nano /etc/systemd/system/process-exporter.service
+
+```
 
 Add the following lines:
 
@@ -650,9 +655,11 @@ WantedBy=multi-user.target
 
 Create and open the Alert manager service file:
 
-> sudo touch /etc/systemd/system/alertmanager.service
->
-> sudo nano /etc/systemd/system/alertmanager.service
+```
+sudo touch /etc/systemd/system/alertmanager.service
+sudo nano /etc/systemd/system/alertmanager.service
+
+```
 
 Add the following lines:
 
@@ -690,19 +697,20 @@ it's not neccessary to create same again
 
 Reload the daemon to configure the services at `systemd`
 
-> sudo systemctl daemon-reload
+```
+sudo systemctl daemon-reload
+```
 
 Start all services:
 
-> sudo systemctl start prometheus.service
->
-> sudo systemctl start node_exporter.service
->
-> sudo systemctl start process-exporter.service
->
-> sudo systemctl start alertmanager.service
->
-> sudo systemctl start grafana-server
+```
+sudo systemctl start prometheus.service
+sudo systemctl start node_exporter.service
+sudo systemctl start process-exporter.service
+sudo systemctl start alertmanager.service
+sudo systemctl start grafana-server
+
+```
 
 Check that all services are in `running` state:
 
@@ -738,7 +746,9 @@ sudo systemctl enable grafana-server
 
 Run this command to fire an alert:
 
-> curl -H "Content-Type: application/json" -d '[{"labels":{"alertname":"Test"}}]' localhost:9093/api/v1/alerts
+```
+curl -H "Content-Type: application/json" -d '[{"labels":{"alertname":"Test"}}]' localhost:9093/api/v1/alerts
+```
 
 <br>
 
@@ -763,11 +773,11 @@ Fill the URL with http://localhost:9093 and click Save & Test.
 
 ## Import the dashboard
 
-Open the New menu:  
+Open the New menu:
 
 ![Grafana import](../storagechain/docs/images/grafana_dashboard.png)
 
-We shall use a [pre-built](https://grafana.com/grafana/dashboards/13840) dashboard.  
+We shall use a [pre-built](https://grafana.com/grafana/dashboards/13840) dashboard.
 
 ![Grafana dashboard](../storagechain/docs/images/import_grafana.png)
 
