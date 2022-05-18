@@ -763,10 +763,12 @@ Fill the URL with http://localhost:9093 and click Save & Test.
 
 ## Import the dashboard
 
-Open the New menu:
+Open the New menu:  
+
 ![Grafana import](../storagechain/docs/images/grafana_dashboard.png)
 
-We shall use a [pre-built](https://grafana.com/grafana/dashboards/13840) dashboard.
+We shall use a [pre-built](https://grafana.com/grafana/dashboards/13840) dashboard.  
+
 ![Grafana dashboard](../storagechain/docs/images/import_grafana.png)
 
 <br>
