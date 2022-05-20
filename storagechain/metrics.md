@@ -205,7 +205,7 @@ Terraform will perform the following actions:
       + backups       = false
       + datacenter    = (known after apply)
       + id            = (known after apply)
-      + image         = "ubuntu-18.04"
+      + image         = "ubuntu-20.04"
       + ipv4_address  = (known after apply)
       + ipv6_address  = (known after apply)
       + ipv6_network  = (known after apply)
