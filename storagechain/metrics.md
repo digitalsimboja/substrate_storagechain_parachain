@@ -1,10 +1,11 @@
 # Collator monitoring & alarming
 
-This document details the Monitoring and Alarming Services for the  
-t3rn project. We intend to implement these metrics instrumentation and  
-visualization using tools such as [Prometheus](https://prometheus.io/) and  
-[Grafana](https://grafana.com/). Susbtrate already has a built-in Prometheus  
-Publisher which we intend to utilize.
+This document details the Monitoring and Alarming Services for the t3rn  
+project. We intend to implement these metrics instrumentation and  
+visualization using tools such as [Prometheus](https://prometheus.io/)  
+and [Grafana](https://grafana.com/) deployed to Hetzner cloud using Terraform.  
+Susbtrate already has a built-in Prometheus Publisher which we intend to  
+utilize.
 
 ## Overview
 
@@ -14,10 +15,15 @@ The general overview of the solution shall be in the form below:
 
 ## Specifications
 
-Here is the description of the components that make up our monitoring and alerting system:  
-**Prometheus:** is the central module; it pulls metrics from different sources to provide them to the Grafana dashboard and Alert Manager.  
-**Grafana** is the visual dashboard tool that we access from the outside (through SSH tunnel to keep the node secure).  
-**Alert Manager** listens to Prometheus metrics and pushes an alert as soon as a threshold is crossed (disk full, no network, bad service status, CPU % usage for example).  
+Here is the description of the components that make up our monitoring and  
+alerting system:  
+**Prometheus:** is the central module; it pulls metrics from different sources  
+to provide them to the Grafana dashboard and Alert Manager.  
+**Grafana** is the visual dashboard tool that we access from the outside   
+(through SSH tunnel to keep the node secure).  
+**Alert Manager** listens to Prometheus metrics and pushes an alert as soon a  
+a threshold is crossed (disk full, no network, bad service status, CPU % usage  
+for example).  
 **Substrate node** (t3rn) natively provides metrics for monitoring.
 **Node exporter** provides hardware metrics of the dashboard.  
 **Process exporter** provides process metrics for the dashboard (optional).
@@ -50,7 +56,7 @@ The goal is to achieve the monitoring of the following metrics:
 >   status, no more collations)
 
 **Note:** The list above is not exhaustive and more metrics can be monitored  
-among the above
+in addtion to the above.
 
 ## Let's get started
 
@@ -63,7 +69,205 @@ sudo apt install -y adduser libfontconfig1
 
 ```
 
+### Setup Terraform and VMs on Hetzner
+
+We shall setup Terraform on our local machine and use it to fire up Ubuntu 20.04 
+VM on Hetzner.
+
+#### Step 1: Install Terraform
+
+First check the [latest](https://github.com/hashicorp/terraform/releases)  
+release of Terraform by HashiCorp. Execute the code below to install Terrafrom  
+on Linux:
+
+```
+TER_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
+
+wget https://releases.hashicorp.com/terraform/${TER_VER}/terraform_${TER_VER}_linux_amd64.zip
+
+```
+
+Extract and move _terraform_ binary to `/usr/local/bin` directory
+
+```
+unzip terraform_${TER_VER}_linux_amd64.zip
+
+sudo mv terraform /usr/local/bin/
+
+```
+
+#### step 2: Create a folder for Terraform projects
+
+```
+mkdir -p ~/t3rn/automation/terraform/hetzner
+cd ~/t3rn/automation/terraform/hetzner
+```
+
+Create Terraform `main.tf` configuration file
+
+```
+touch main.tf
+```
+
+#### Step 3: Generate Hetzner API token
+
+Navigate to [Hetzner Console](https://console.hetzner.cloud/projects) and click **Access > API TOKENS > GENERATE API**
+
 <br>
+
+![Hetzner API Token](../storagechain/docs/images/hetzner-api-token.png)  
+
+<br>
+
+#### Step 4: Add SSH Key to Hetzner
+In order to access Hetzner Cloud VM via SSH, copy your SSH public key or generate one if you don't have:
+
+```
+ssh-keygen -q -N ""
+Hit enter to save the key to default
+
+xclip -sel clip ~/.ssh/id_rsa.pub
+
+```
+
+Login to Hetzner console and add your ssh keys to **Access > SSH KEYS > ADD SSH KEY**
+
+
+Copy the fingerprint generated, something like de:c7:80:23:5b:3e:28:52:1a:5d:0f:84:1b:fe:38:ec.
+
+#### Step 5: Add Terraform configuration file
+
+Edit the `main.tf` _terraform_ configuration file below:
+
+```
+nano main.tf
+```
+
+Add the configuration below:
+
+```
+############## Variables ###############
+# Token variable
+variable "hcloud_token" {
+default = "HETZNER_API_TOKEN"
+}
+
+# Define Hetzner provider
+provider "hcloud" {
+  token = "${var.hcloud_token}"
+}
+
+# Obtain ssh key data
+data "hcloud_ssh_key" "ssh_key" {
+  fingerprint = "PASTE_ADDED_SSH_KEY_FINGERPRINT_HERE"
+}
+
+# Create an Ubuntu 20.04 server
+resource "hcloud_server" "ubuntu20" {
+  name = "ubuntu20"
+  image = "ubuntu-20.04"
+  server_type = "cx11"
+  ssh_keys  = ["${data.hcloud_ssh_key.ssh_key.id}"]
+}
+
+# Output server IPs
+output "server_ip_ubuntu20" {
+ value = "${hcloud_server.ubuntu20.ipv4_address}"
+}
+
+```
+
+Initialize a Terraform working directory:
+
+```
+terraform  init
+```
+This would download provider automatically to `.terraform`  
+Now execute the `terraform apply` command below to build the infrastructure
+```
+terraform apply
+```
+
+This would output the public IP address of the VM.  
+```
+
+data.hcloud_ssh_key.ssh_key: Refreshing state...
+
+An execution plan has been generated and is shown below.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+ # hcloud_server.ubuntu18 will be created
+  + resource "hcloud_server" "ubuntu20" {
+      + backup_window = (known after apply)
+      + backups       = false
+      + datacenter    = (known after apply)
+      + id            = (known after apply)
+      + image         = "ubuntu-18.04"
+      + ipv4_address  = (known after apply)
+      + ipv6_address  = (known after apply)
+      + ipv6_network  = (known after apply)
+      + keep_disk     = false
+      + location      = (known after apply)
+      + name          = "ubuntu16"
+      + server_type   = "cx11"
+      + ssh_keys      = [
+          + "421205",
+        ]
+      + status        = (known after apply)
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy
+
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+  hcloud_server.ubuntu20: Creating...
+
+  hcloud_server.ubuntu18: Creation complete after 8s [id=2869954]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+
+server_ip_ubuntu20 = 117.210.48.210
+
+```
+Login to the VM using the server_ip on the output above:
+
+```
+ssh root@117.210.48.210
+Warning: Permanently added '117.210.48.210' (ECDSA) to the list of known hosts.
+Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 4.15.0-50-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Mon May 20 21:25:40 CEST 2022
+
+  System load:  0.65              Processes:           87
+  Usage of /:   8.4% of 18.72GB   Users logged in:     0
+  Memory usage: 6%                IP address for eth0: 116.203.48.203
+  Swap usage:   0%
+
+
+73 packages can be updated.
+40 updates are security updates.
+root@ubuntu18:~# 
+
+```
+
+<br>
+
+Let's now provide the configuration for setting up **Prometheus** and **Grafana**
 
 **Download** the latest releases of [Prometheus](https://prometheus.io/download/), [Process exporter](https://github.com/ncabatoff/process-exporter/releases) and
 [Grafana](https://grafana.com/grafana/download) from their respective download

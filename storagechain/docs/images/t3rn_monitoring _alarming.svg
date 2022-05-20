@@ -3959,5 +3959,8 @@ KKACiiigD//Z"/>
 </g>
 <text fill="#212121" xml:space="preserve" transform="matrix(1 0 -0 1 0 5184)" font-size="100" font-family="Helvetica"><tspan y="-2367" x="7262 7323.1 7378.7 7400.9006 7456.5007 7512.1008 7545.4006 7601.0007 7684.3005 7712.1 7778.8005 7801.0007 7856.6008 7889.9006">Telegram Alert</tspan></text>
 <text fill="#ffffff" xml:space="preserve" transform="matrix(1 0 -0 1 0 5184)" font-size="100.2" font-family="Helvetica"><tspan y="-2223" x="768 795.8556 851.5668 884.93338">t3rn</tspan></text>
+<path transform="matrix(1,0,0,-1,0,5184)" d="M 302 4004 L 1175.8145 4004 L 1175.8145 4200.479 L 302 4200.479 Z " fill="#e9f0f8"/>
+<path transform="matrix(1,0,0,-1,0,5184)" stroke-width="10.341" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#e9f0f8" d="M 302 4004 L 1175.8145 4004 L 1175.8145 4200.479 L 302 4200.479 Z "/>
+<text fill="#212121" xml:space="preserve" transform="matrix(1 0 -0 1 0 5184)" font-size="100.2" font-family="Helvetica"><tspan y="-4001" x="344 416.34443 472.05564 499.91123 550.0112 605.7224 661.4336 694.8002 722.65579 795.0002 817.24459 872.95578 928.66696 984.3781 1012.2337 1079.0671 1134.7783 1168.1449 1218.2449 1273.956">Hetzner Cloud Server</tspan></text>
 </g>
 </svg>
