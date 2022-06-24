@@ -29,7 +29,7 @@ Ensure you have Rust setup on your machine. Follow these steps to get Substrate 
 📝 Setting up Enviroment [Rust](https://docs.substrate.io/tutorials/v3/create-your-first-substrate-chain/)
 
 Clone the repo:
-`git clone https://github.com/digitalsimboja/t3rn_substrate_task.git`
+`git clone https://github.com/digitalsimboja/substrate_storagechain_parachain.git`
 
 CD into the Storagechain directory
 `cd storagechain`
